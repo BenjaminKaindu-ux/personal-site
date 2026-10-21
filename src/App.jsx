@@ -15,7 +15,6 @@ import "./App.css";
 
 export default function App() {
   const { view, slug, query } = useRoute();
-  const dev = import.meta.env.DEV;
 
   let page;
   switch (view) {
@@ -38,7 +37,7 @@ export default function App() {
       page = <Contact subject={query.subject} />;
       break;
     case "studio":
-      page = dev ? <Studio /> : <StudioOffline />;
+      page = <Studio />;
       break;
     default:
       page = <Home />;
@@ -50,23 +49,5 @@ export default function App() {
       <main>{page}</main>
       <Footer />
     </div>
-  );
-}
-
-function StudioOffline() {
-  return (
-    <section className="page">
-      <div className="container narrow">
-        <div className="prose-card">
-          <h1 className="page-title">The Write studio is a local tool</h1>
-          <p>
-            The studio only saves files while the dev server is running on your machine — that’s what
-            keeps this site 100% static with no backend.
-          </p>
-          <pre className="code-inline-step">npm run dev</pre>
-          <p>…then open <code>#/studio</code> from that page and get writing.</p>
-        </div>
-      </div>
-    </section>
   );
 }

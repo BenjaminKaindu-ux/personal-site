@@ -12,6 +12,7 @@ const TYPES = [
 ];
 
 const today = () => new Date().toISOString().slice(0, 10);
+const DRAFT_KEY = "ig.studio.draft";
 
 const slugify = (s) =>
   s
@@ -47,6 +48,8 @@ function buildFooter(type) {
 }
 
 export default function Studio() {
+  const dev = import.meta.env.DEV;
+
   const [form, setForm] = useState({
     title: "",
     date: today(),
@@ -56,29 +59,36 @@ export default function Studio() {
     excerpt: "",
     body: "",
   });
-  const [saved, setSaved] = useState(null);
+  const [saved, setSaved] = useState(null); // file path (dev) or "draft"/"download" note
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [hasDraft, setHasDraft] = useState(() => {
+    try {
+      return Boolean(localStorage.getItem(DRAFT_KEY));
+    } catch {
+      return false;
+    }
+  });
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
   const preview = useMemo(() => {
     const body = form.body.trim() || "*(The page is dark until you write something.)*";
-    const pre =
-      form.title.trim()
-        ? `# ${form.title}\n\n` +
-          (form.excerpt ? `> ${form.excerpt.replace(/\n/g, " ")}\n\n` : "") +
-          body
-        : body;
+    const pre = form.title.trim()
+      ? `# ${form.title}\n\n` + (form.excerpt ? `> ${form.excerpt.replace(/\n/g, " ")}\n\n` : "") + body
+      : body;
     return pre;
   }, [form.body, form.title, form.excerpt]);
 
   const filename = useMemo(() => `${slugify(form.title) || "untitled"}.md`, [form.title]);
-
   const md = useMemo(() => buildMarkdown(form), [form]);
+  const activeStyle = styleById(form.styleId);
 
-  async function save() {
+  /* ----- actions ----- */
+
+  async function saveToContent() {
+    // Dev server only — writes the file into ./content on your machine.
     if (!form.title.trim()) {
       setError("Give it a title first — the filename comes from it.");
       return;
@@ -95,14 +105,60 @@ export default function Studio() {
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || "Could not save");
       setSaved({ file: data.file });
-    } catch (err) {
-      setError(
-        String(err.message || err).includes("fetch")
-          ? "The local writer isn’t running. Start it with `npm run dev` (the studio needs the dev server to save files)."
-          : String(err.message || err)
-      );
+      saveDraft();
+    } catch {
+      setError("Couldn’t reach the local writer. Use Download .md instead.");
     } finally {
       setBusy(false);
+    }
+  }
+
+  function downloadMd() {
+    if (!form.title.trim()) {
+      setError("Give it a title first — the filename comes from it.");
+      return;
+    }
+    setError("");
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    setSaved({ note: `Downloaded ${filename}` });
+  }
+
+  function saveDraft() {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...form, savedAt: Date.now() }));
+      setHasDraft(true);
+      setSaved({ note: "Draft saved in this browser" });
+    } catch {
+      setError("Your browser blocked storage — use Download .md instead.");
+    }
+  }
+
+  function loadDraft() {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      setForm({
+        title: d.title || "",
+        date: d.date || today(),
+        type: d.type || "essays",
+        styleId: d.styleId || "essay",
+        tags: d.tags || "",
+        excerpt: d.excerpt || "",
+        body: d.body || "",
+      });
+      setHasDraft(true);
+      setSaved({ note: "Draft loaded — keep writing" });
+    } catch {
+      setError("Couldn’t read the saved draft.");
     }
   }
 
@@ -116,7 +172,7 @@ export default function Studio() {
     }
   }
 
-  const activeStyle = styleById(form.styleId);
+  const primary = dev ? "Save to content/" : "Download .md";
 
   return (
     <section className="page studio-page">
@@ -127,10 +183,31 @@ export default function Studio() {
             <p className="eyebrow">Write studio</p>
             <h1 className="page-title">New piece</h1>
             <p className="page-lede">
-              Write freely — prose, notes, code. It saves as a Markdown file into{" "}
-              <code>content/</code> on this machine only. Nothing needs a server, database, or API key.
+              Write freely — prose, notes, code.{" "}
+              {dev ? (
+                <>
+                  <strong>On dev:</strong> “Save to content/” writes the file into <code>content/</code>{" "}
+                  on your machine.
+                </>
+              ) : (
+                <>
+                  <strong>On the live site:</strong> the site stays 100% static — so save a draft to
+                  this browser or download the finished <code>.md</code> to publish (drop it in the
+                  GitHub repo and it redeploys).
+                </>
+              )}
             </p>
           </header>
+
+          {hasDraft && !dev && (
+            <div className="draft-banner">
+              <Icon name="book" />
+              <span>A draft is saved in this browser from last time.</span>
+              <button type="button" className="btn btn-ghost btn-small" onClick={loadDraft}>
+                Load draft
+              </button>
+            </div>
+          )}
 
           <div className="studio-field">
             <label htmlFor="st-title">Title</label>
@@ -149,7 +226,6 @@ export default function Studio() {
               </select>
               <small className="field-hint">{TYPES.find((t) => t.id === form.type).hint}</small>
             </div>
-
             <div className="studio-field">
               <label htmlFor="st-date">Date</label>
               <input id="st-date" type="date" value={form.date} onChange={set("date")} />
@@ -194,7 +270,9 @@ export default function Studio() {
           <div className="studio-field">
             <label htmlFor="st-body">
               Body — write here
-              <span className="md-help"> markdown: ## headings, **bold**, *italic*, `code`, ``` blocks, - lists, 1. lists, &gt; quotes</span>
+              <span className="md-help">
+                markdown: ## headings, **bold**, *italic*, `code`, ``` blocks, - lists, 1. lists, &gt; quotes
+              </span>
             </label>
             <textarea
               id="st-body"
@@ -207,20 +285,32 @@ export default function Studio() {
           </div>
 
           <div className="studio-actions">
-            <button type="button" className="btn btn-primary" onClick={save} disabled={busy}>
+            <button type="button" className="btn btn-primary" onClick={dev ? saveToContent : downloadMd} disabled={busy}>
               <Icon name="pen" />
-              {busy ? "Saving…" : "Save to content/"}
+              {busy ? "Saving…" : primary}
             </button>
             <button type="button" className="btn btn-ghost" onClick={copyMd}>
               {copied ? "Copied ✓" : "Copy markdown"}
             </button>
+            <button type="button" className="btn btn-ghost" onClick={saveDraft}>
+              <Icon name="book" /> Save draft
+            </button>
             {saved && (
               <span className="save-ok">
-                ✓ Saved <code>{saved.file}</code> — restart <code>npm run dev</code> and it appears in the lists.
+                ✓ {saved.note || `Saved to ${saved.file}`}
+                {!dev && saved.file ? " — restart npm run dev to see it in the lists." : ""}
               </span>
             )}
             {error && <span className="save-err">{error}</span>}
           </div>
+
+          {!dev && (
+            <p className="publish-tip">
+              <strong>To publish from here:</strong> download the <code>.md</code>, then in GitHub →
+              your <code>content/{form.type}/</code> folder click <em>Add file → Create new file</em>,
+              paste it, commit — Cloudflare redeploys automatically.
+            </p>
+          )}
         </div>
 
         {/* Preview pane */}

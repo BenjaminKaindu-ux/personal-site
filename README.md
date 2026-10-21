@@ -29,19 +29,25 @@ npm run preview
 
 ## ✍️ The Writing Studio — where you actually write
 
-Open the site in dev mode and click **Write** in the navigation (or go to
-`http://localhost:5173/#/studio`). You get a proper editor:
+Click **Write** in the navigation (or go to `#/studio`) — works both locally **and on the live site**.
+
+You get a proper editor:
 
 - **Title, date, type** (essay / idea / learning note / project), tags, excerpt, and a big body
   textarea with **live Markdown preview**
 - **Writing-style guide** — choose from 8 common styles (Reflective Essay, Insight, Diary,
   Story, Argument, How-to, Listicle, Letter) and see its voice + structure as you write
-- **Save to `content/`** — your new piece is written to `content/<type>/<filename>.md` on your
-  machine, through a tiny dev-server-only helper. It is never part of the production site.
+- **Save** — works honestly with no backend, in two different ways:
 
-> The studio needs the dev server to save files — that's deliberate, and it's what keeps the
-> deployed site 100% static, with zero backend. Restart `npm run dev` after saving a new file to
-> see it in the lists, then `npm run build` to include it in the production site.
+  **On your machine (`npm run dev`):** *Save to content/* writes the file straight into
+  `content/<type>/<filename>.md` through a tiny dev-server-only helper.
+
+  **On the deployed site:** the site stays 100% static, so the studio gives you
+  *Save draft* (keeps your work in your browser, private) and *Download .md* / *Copy markdown* —
+  to publish, upload the file to your repo's `content/` folder and Cloudflare redeploys.
+
+> Restart `npm run dev` after saving locally to see the new file in the lists, then
+> `npm run build` to include it in the production site.
 
 ### If you'd rather just write Markdown by hand
 

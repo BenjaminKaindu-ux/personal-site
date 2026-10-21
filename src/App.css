@@ -420,6 +420,44 @@
   margin-top: 8px;
 }
 
+.draft-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  background: var(--terra-2);
+  border: 1px solid rgba(189, 101, 58, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  color: #7a3a1c;
+  font-size: 0.9rem;
+}
+
+.draft-banner svg {
+  font-size: 1.15rem;
+}
+
+.btn-small {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+.publish-tip {
+  margin-top: 20px;
+  padding: 14px 18px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--radius-sm);
+  background: var(--paper-2);
+  font-size: 0.88rem;
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+
+.publish-tip code {
+  word-break: break-all;
+}
+
 .save-ok {
   font-size: 0.88rem;
   color: var(--green-2);
