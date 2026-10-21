@@ -1,51 +1,45 @@
-import { ideas, profile } from "../config";
+import { content } from "../content";
 import Icon from "./icons";
 import Reveal from "./Reveal";
+import { PageHead, Empty } from "./ui";
+import { respondHref } from "../respond";
 
 export default function Ideas() {
+  const items = content.ideas;
   return (
-    <section id="ideas" className="section">
+    <section className="page">
       <div className="container">
-        <div className="section-head">
-          <Reveal>
-            <span className="eyebrow">Ideas</span>
-          </Reveal>
-          <Reveal delay={80}>
-            <h2 className="section-title">Thoughts & half-formed ideas</h2>
-          </Reveal>
-          <Reveal delay={140}>
-            <p className="section-sub">
-              Notes from the notebook — the kind that keep me up slightly too late. If one
-              strikes a chord, email me and we’ll talk it through.
-            </p>
-          </Reveal>
-        </div>
+        <PageHead
+          eyebrow="Ideas & insights"
+          title="Open threads"
+          lede="Short reflections, questions, and unfinished thoughts — the half-formed seeds of the garden. If one catches you, jump in."
+        />
 
-        <div className="cards-grid">
-          {ideas.map((idea, i) => (
-            <Reveal
-              as="article"
-              key={idea.title}
-              className="card idea-card"
-              delay={(i % 3) * 90}
-            >
-              <span className="pill pill-subtle">{idea.status}</span>
-              <h3 className="card-title">{idea.title}</h3>
-              <p className="card-body">{idea.description}</p>
-              <div className="card-footer">
-                <a
-                  className="link-arrow"
-                  href={`mailto:${profile.email}?subject=${encodeURIComponent(
-                    `Re: "${idea.title}"`
-                  )}`}
-                >
-                  <Icon name="mail" />
-                  Discuss this idea
-                </a>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+        {items.length > 0 ? (
+          <div className="ideas-grid">
+            {items.map((idea, i) => (
+              <Reveal as="article" key={idea.slug} className="card idea-card" delay={(i % 3) * 70}>
+                <div className="card-top">
+                  <span className="pill pill-sage">
+                    {idea.status === "sample" ? "Sample thought" : idea.dateLabel || "Note"}
+                  </span>
+                </div>
+                <h3 className="card-title">{idea.title}</h3>
+                {idea.excerpt && <p className="card-excerpt">{idea.excerpt}</p>}
+                <div className="card-cta">
+                  <a className="text-link" href={respondHref(idea.title)}>
+                    <Icon name="reply" /> Jump in
+                  </a>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        ) : (
+          <Empty
+            title="No ideas yet"
+            lede="Small thoughts will live here — add the first one from the Write studio."
+          />
+        )}
       </div>
     </section>
   );

@@ -1,4 +1,5 @@
-import { profile, photoCredit } from "../config";
+import { profile, socials, photoCredit } from "../config";
+import Icon from "./icons";
 
 const currentYear = new Date().getFullYear();
 
@@ -6,12 +7,33 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="container footer-inner">
-        <p>
-          © {currentYear} {profile.name}. Made with React & Vite, steeped in nature.
-        </p>
-        <p className="footer-photo">
-          Background photo by {photoCredit.photographer} on {photoCredit.site} — free to use.
-        </p>
+        <div className="footer-brand">
+          <p className="footer-name">{profile.name}</p>
+          <p className="footer-tagline">{profile.tagline}</p>
+        </div>
+
+        <div className="footer-meta">
+          <p>
+            © {currentYear} {profile.firstName} · Built with React &amp; Vite ·{" "}
+            {photoCredit.photographer ? `Photo: ${photoCredit.photographer} (${photoCredit.site})` : ""}
+          </p>
+          <div className="footer-socials">
+            {socials
+              .filter((s) => s.url)
+              .map((s) => (
+                <a
+                  key={s.label}
+                  href={s.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={s.label}
+                  title={s.label}
+                >
+                  <Icon name={s.icon} />
+                </a>
+              ))}
+          </div>
+        </div>
       </div>
     </footer>
   );

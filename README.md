@@ -1,8 +1,10 @@
-# 🌲 Personal Site — React + Vite
+# 🌱 Benjamin Kaindu — Personal "Idea Garden"
 
-A polished, responsive personal website for sharing **projects**, **ideas**, and **thoughts** — with a contact section that invites visitors to email you directly. Fully **static**: no backend, no API keys, no server. The nature photos ship with the site, so it works anywhere you put it.
+A polished, responsive, **fully static** personal site for essays, ideas, projects, and learning
+notes — built with **React + Vite**, hosted anywhere including **Cloudflare Pages**.
 
-![Stack](https://img.shields.io/badge/React-19-blue) ![Vite](https://img.shields.io/badge/Vite-8-purple) ![Build](https://img.shields.io/badge/build-dist-green)
+There is **no backend, no database, no login, no API keys, and no server-side functions**. The
+whole site is built from plain **Markdown files** in the `content/` folder.
 
 ---
 
@@ -12,23 +14,111 @@ A polished, responsive personal website for sharing **projects**, **ideas**, and
 # 1. Install dependencies (first time only)
 npm install
 
-# 2. Run the dev server (hot reload at http://localhost:5173)
+# 2. Start the dev server (includes the built-in Writing Studio)
 npm run dev
+# → http://localhost:5173
 
-# 3. Build the production site — output goes to ./dist
+# 3. Build the static site — output goes to ./dist
 npm run build
 
-# 4. Preview the production build locally
+# 4. Preview the production build
 npm run preview
 ```
 
-> Build output is written to **`dist/`** by default (Vite convention). Deploy that folder to any static host: GitHub Pages, Netlify, Cloudflare Pages, Vercel, an S3 bucket, or `scp` it to any web server.
+---
+
+## ✍️ The Writing Studio — where you actually write
+
+Open the site in dev mode and click **Write** in the navigation (or go to
+`http://localhost:5173/#/studio`). You get a proper editor:
+
+- **Title, date, type** (essay / idea / learning note / project), tags, excerpt, and a big body
+  textarea with **live Markdown preview**
+- **Writing-style guide** — choose from 8 common styles (Reflective Essay, Insight, Diary,
+  Story, Argument, How-to, Listicle, Letter) and see its voice + structure as you write
+- **Save to `content/`** — your new piece is written to `content/<type>/<filename>.md` on your
+  machine, through a tiny dev-server-only helper. It is never part of the production site.
+
+> The studio needs the dev server to save files — that's deliberate, and it's what keeps the
+> deployed site 100% static, with zero backend. Restart `npm run dev` after saving a new file to
+> see it in the lists, then `npm run build` to include it in the production site.
+
+### If you'd rather just write Markdown by hand
+
+Every piece of content is a normal file:
+
+```
+content/
+├── essays/    Longer essays  (article pages with dates, tags, reading time)
+├── ideas/     Short thoughts & open threads (cards with "Jump in" links)
+├── notes/     Learning notes about AI/ML/Python etc.
+└── projects/  Projects (cards + detail pages with status and links)
+```
+
+Each file starts with a small frontmatter block:
+
+```md
+---
+title: My essay title
+date: 2026-10-18
+tags: [ml, pytorch]          # single or multiple topics
+style: essay                 # optional: essay | insight | note | story | argument | guide | listicle | letter
+excerpt: One or two lines for the card.
+status: sample               # optional: shows a "Sample" badge you can remove
+links:                       # optional (projects): label + URL
+  - Demo: https://example.com
+---
+
+Body text here. **Markdown is supported:**
+## headings, *italic*, `code`, ```python blocks```, - lists, 1. lists, > quotes, [links](url)
+```
+
+**Markdown syntax supported:** headings (H1–H4), paragraphs, bold, italic, inline code,
+fenced code blocks (with language label), bullet & numbered lists, blockquotes, links, and
+horizontal rules. Raw HTML is **never** rendered (safe by design).
+
+### ✂️ Removing the sample content
+
+The demo files are deliberately tiny and clearly marked with a **Sample** badge:
+
+```bash
+rm content/essays/sample-learning-in-public.md
+rm content/ideas/sample-learning-by-building.md
+rm content/notes/sample-pytorch-tensor-shapes.md
+rm content/projects/sample-data-explorer.md
+```
+
+`content/projects/hermes.md` is real (not sample) — an early-stage idea of yours. Keep it,
+edit it, or remove it; everything is your call.
 
 ---
 
-## ✏️ Make it yours
+## 🧭 Pages & features
 
-Everything you’re likely to edit lives in **one file**:
+| Route | Page |
+| --- | --- |
+| `#/` | Home — intro, selected essays/ideas/projects/notes, CTA |
+| `#/essays` | Essays — search + topic filters + respond links |
+| `#/essays/<slug>` | Individual essay (dates, tags, reading time, respond) |
+| `#/ideas` | Ideas & insights — short open threads |
+| `#/projects` | Project cards with honest statuses |
+| `#/projects/<slug>` | Project detail page (purpose, status, links) |
+| `#/notes` | Learning notes — search + topic filters |
+| `#/notes/<slug>` | Individual note |
+| `#/about` | About — real facts only, everything editable |
+| `#/contact` | Email contact (subject auto-filled from respond links) + socials |
+| `#/studio` | **Writing Studio** (dev server only) |
+
+**Visitor responses:** every essay, project, and idea ends with a **Respond** link that opens
+your email with the title pre-filled as the subject. No pretend comment form — just email.
+
+Search, topic filters, reading time, dates, and helpful empty states are built in.
+
+---
+
+## ✏️ Making it yours
+
+One file controls everything personal:
 
 ```
 src/config.js
@@ -36,145 +126,80 @@ src/config.js
 
 | Key | What it controls |
 | --- | --- |
-| `profile.name` | Your name (nav, hero, footer, mailto greeting) |
-| `profile.role` / `headline` / `tagline` | Hero copy |
-| `profile.bio` | About-section paragraphs (one array entry = one paragraph) |
-| `profile.focus` | The "Currently" chips in About |
-| `profile.email` | **The address all Contact links point to** |
-| `profile.resumeUrl` | Optional résumé link (leave `""` to hide the button) |
-| `projects[]` | Project cards — title, description, tags, link, emoji icon |
-| `ideas[]` | Idea cards + each gets a "Discuss this idea" mailto link |
-| `socials[]` | Social buttons (icons: `github`, `x`, `linkedin`, `mail`, `rss`) |
-| `backgroundImage` | Which nature photo is the site background |
+| `profile.name` / `firstName` | Your name everywhere |
+| `profile.role`, `intro`, `summary` | Hero copy |
+| `profile.location` | Shown wherever "where I am" appears |
+| `profile.email.primary` / `.secondary` | All Respond & Contact links point here |
+| `learning.courses` / `currently` / `exploring` | About page facts (edit to match reality) |
+| `socials[]` | GitHub, LinkedIn, Hugging Face, Kaggle links |
+| `heroImage` | Which local nature photo fronts the home page |
 
-### ✍️ Writing — short essays, insights & anything you want to share
-
-All your writing lives in **`src/writing.js`** — add a post and it shows up, rebuilt into a
-beautiful full-page article. No backend, no forms, no API keys: the site is static, you are the
-editor.
-
-```js
-post = {
-  title: "Why I keep a paper map",
-  date: "2026-10-18",          // ISO date, shown nicely on the site
-  style: "essay",              // one of the 8 styles below
-  excerpt: "One or two lines shown on the card.",
-  blocks: [ ... ]              // plain-text blocks — see cheat-sheet
-}
-```
-
-**Blocks cheat-sheet** (the `blocks` array):
-
-| Write | Gives you |
-| --- | --- |
-| `"Some text"` | a paragraph (first one gets a drop cap) |
-| `["h", "Sub heading"]` | a sub-heading |
-| `["q", "quote"]` or `["q", "quote", "— who"]` | a pull-quote |
-| `["list", ["a", "b"]]` | bullet list |
-| `["ol", ["1", "2"]]` | numbered list |
-| `["steps", ["Do this", "Then that"]]` | big numbered steps (how-tos) |
-| `["center", "One-line takeaway"]` | centered call-out line |
-| `["salutation", "Dear reader,"]` | letter greeting |
-| `["sign", "— Alex"]` | letter sign-off |
-| `["st", "A bold statement"]` | manifesto-style statement |
-| `["hr"]` | a divider |
-
-You can also use `**bold**` and `*italic*` inside any text.
-
-### ✒️ The writing styles field guide
-
-The **Writing** section includes a built-in guide to the 8 most common writing styles. Tap any
-tile on the site to see its voice, shape, and a ready-to-fill template you can copy straight
-into `src/writing.js`:
-
-1. **Reflective Essay** — a careful, personal walk through one question
-2. **Insight / Spark** — one sharp observation, delivered clean
-3. **Journal / Diary Note** — a dated, honest note from where you are
-4. **Narrative / Storytelling** — scene-first, put the reader there
-5. **Argument / Persuasion** — take a side, build the case, stay fair
-6. **How-to / Guide** — teach a process someone can follow
-7. **Listicle / Quick List** — snappy and scannable
-8. **Letter / Correspondence** — write to one person, let everyone read it
-
-The seeded posts in `src/writing.js` are examples demonstrating every block type and several
-styles — replace them with your own.
-
-### 📷 Nature background & images
-
-Photos live in `public/images/` and are included in every build:
-
-| File | Photo |
-| --- | --- |
-| `nature-mountains.jpg` | Foggy mountain ridge at sunrise (default background) |
-| `nature-main.jpg` | Yosemite valley river at dusk |
-| `nature-forest.jpg` | Sunlit green forest |
-| `nature-field.jpg` | Golden field at sunset |
-
-To use a different one (or your own photo), change one line in `src/config.js`:
-
-```js
-export const backgroundImage = "/images/nature-forest.jpg";
-```
-
-Drop any new image into `public/images/` and reference it the same way — it will be copied into `dist/` automatically.
-
-All photos are from **Unsplash** and free to use (no attribution required). See `profile.photoCredit` in the footer config if you’d like to adjust the credit.
+The About page contains **only facts you've shared** — course completions, current learning,
+interests. It makes no claims beyond that. Adjust it whenever you like.
 
 ---
 
-## 🧱 What’s inside
+## ☁️ Deploying to Cloudflare Pages
 
-```
-personal-site/
-├── index.html            # HTML shell, fonts, meta
-├── package.json
-├── vite.config.js
-├── public/
-│   ├── favicon.svg      # Site icon (custom leaf mark)
-│   └── images/          # Nature photos used site-wide
-└── src/
-    ├── main.jsx
-    ├── App.jsx          # Layout shell + nature background
-    ├── config.js        # ⭐ Your profile, projects, ideas & socials
-    ├── writing.js       # ⭐ Your essays, insights & the styles guide
-    ├── index.css        # Design tokens, base styles, animations
-    ├── App.css          # Component styles (fully responsive)
-    └── components/
-        ├── Navbar.jsx   # Fixed nav + mobile hamburger menu
-        ├── Hero.jsx     # Full-screen intro over the nature bg
-        ├── About.jsx    # Bio + "Currently" focus chips
-        ├── Writing.jsx  # Essays/insights + writing-styles field guide
-        ├── Projects.jsx # Project cards grid
-        ├── Ideas.jsx    # Idea cards with mailto "Discuss" links
-        ├── Contact.jsx  # Email CTA + social buttons
-        ├── Footer.jsx
-        ├── Reveal.jsx   # Scroll-into-view fade helper (no libraries)
-        └── icons.jsx    # Tiny inline SVG icons (dependency-free)
-```
+1. Push this repository to GitHub (e.g. `BenjaminKaindu-ux/personal-site`).
+2. In the Cloudflare dashboard → **Workers & Pages → Create → Pages → Connect to Git**.
+3. Select the repo, then set:
 
-## ✨ Highlights
+   - **Project name:** anything (e.g. `benjamin-kaindu`)
+   - **Framework preset:** *Vite*
+   - **Root directory:** *(leave blank — the project is at the repo root)*
+   - **Build command:** `npm run build`
+   - **Build output directory:** `dist`
 
-- **No build complexity** — plain React + Vite, zero extra runtime dependencies.
-- **Contact without a backend** — the Contact section and every "Discuss this idea" link are plain `mailto:` links; no forms, no servers, no API keys.
-- **Fully responsive** — desktop grid, mobile hamburger nav, fluid typography.
-- **Accessible & respectful** — semantic markup, focus states, `prefers-reduced-motion` support.
-- **Static by design** — fonts fall back gracefully if offline; images are local.
+4. **Save & Deploy.** That's it — no `wrangler deploy`, no Worker, no functions. Cloudflare
+   serves the static files straight from `dist/` on every push.
 
-## 🛠 Useful scripts
+> ℹ️ This is a **static Pages site only** — zero server-side code ships to production. The
+> Writing Studio's save feature exists solely in local dev (`npm run dev`); the deployed site
+> contains no mechanism (and no API keys) to write files.
+
+---
+
+## 🧰 Useful scripts
 
 | Command | Does |
 | --- | --- |
-| `npm run dev` | Start dev server with hot reload |
-| `npm run build` | Build static site into `dist/` |
+| `npm run dev` | Dev server + Writing Studio |
+| `npm run build` | Production build into `dist/` |
 | `npm run preview` | Serve the `dist/` build locally |
-| `npm run lint` | Lint the source (oxlint) |
+| `npm run lint` | Lint source (oxlint) |
+| `npm run studio` | Same as `npm run dev` (alias convenience) |
 
-## 📝 Deployment example (Netlify / Vercel / GitHub Pages)
-
-- **Netlify / Vercel / Cloudflare Pages**: connect the repo — build command `npm run build`, publish directory **`dist`**.
-- **GitHub Pages** (`docs/` or Actions): build locally with `npm run build` and push the contents of `dist/` to your Pages branch, running in `/docs` mode if you need a sub-path.
-- **Any host**: `dist/` is a plain folder of static files — drop it on any web server.
+> Note: `npm run build` is the production build command and the output is always `dist/`.
 
 ---
 
-Made with 🥾 and a view of the mountains. If this inspired an idea, the contact section knows how to find me — that’s the whole point.
+## 🗂 Project structure
+
+```
+├── content/                  ← ALL your writing lives here (Markdown)
+│   ├── essays/
+│   ├── ideas/
+│   ├── notes/
+│   └── projects/
+├── public/
+│   ├── favicon.svg
+│   └── images/               ← local nature photos (bundled into dist/)
+└── src/
+    ├── config.js             ← your name, emails, socials (edit me)
+    ├── content.js            ← loads + parses all Markdown at build
+    ├── markdown.jsx          ← safe Markdown renderer (no raw HTML)
+    ├── router.js             ← tiny hash router (static-host friendly)
+    ├── styles.js             ← the 8 writing styles guide
+    ├── components/
+    │   ├── Studio.jsx        ← the Writing Studio (dev only)
+    │   ├── Home/ Essays/ Ideas/ Projects/ Notes/ About/ Contact …
+    │   └── ...
+    ├── index.css             ← design tokens & base (cream editorial theme)
+    └── App.css               ← layout & components
+```
+
+---
+
+Made with React, Vite, and a keyboard — read something that struck a nerve? The respond links
+know the way to the inbox.

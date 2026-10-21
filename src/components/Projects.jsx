@@ -1,63 +1,48 @@
-import { projects } from "../config";
+import { content } from "../content";
 import Icon from "./icons";
 import Reveal from "./Reveal";
+import { PageHead, Empty, TagList, SampleBadge } from "./ui";
 
 export default function Projects() {
+  const items = content.projects;
   return (
-    <section id="projects" className="section">
+    <section className="page">
       <div className="container">
-        <div className="section-head">
-          <Reveal>
-            <span className="eyebrow">Projects</span>
-          </Reveal>
-          <Reveal delay={80}>
-            <h2 className="section-title">Things I’ve made</h2>
-          </Reveal>
-        </div>
+        <PageHead
+          eyebrow="Projects"
+          title="In the workshop"
+          lede="Experiments, tools, and works in progress — with honest statuses. Nothing here is over-sold."
+        />
 
-        <div className="cards-grid">
-          {projects.map((project, i) => (
-            <Reveal
-              as="article"
-              key={project.title}
-              className="card project-card"
-              delay={(i % 3) * 90}
-            >
-              <div className="project-top">
-                <span className="project-icon" aria-hidden="true">
-                  {project.icon}
-                </span>
-                {project.featured && <span className="pill">Featured</span>}
-              </div>
-              <h3 className="card-title">{project.title}</h3>
-              <p className="card-body">{project.description}</p>
-              {project.tags?.length > 0 && (
-                <ul className="tag-list">
-                  {project.tags.map((tag) => (
-                    <li key={tag} className="tag">
-                      {tag}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div className="card-footer">
-                {project.url ? (
-                  <a
-                    className="link-arrow"
-                    href={project.url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    See it live
-                    <Icon name="external" />
+        {items.length > 0 ? (
+          <div className="cards-grid">
+            {items.map((p, i) => (
+              <Reveal as="article" key={p.slug} className="card" delay={(i % 3) * 70}>
+                <div className="card-top">
+                  <span className={`pill ${p.status === "sample" ? "pill-sage" : "pill-terra"}`}>
+                    {p.status === "sample" ? "Sample project" : p.status || "Project"}
+                  </span>
+                  <SampleBadge status={p.status} />
+                </div>
+                <h3 className="card-title">
+                  <a href={`#/projects/${p.slug}`}>{p.title}</a>
+                </h3>
+                <p className="card-excerpt">{p.excerpt}</p>
+                <TagList tags={p.tags.slice(0, 4)} />
+                <div className="card-cta">
+                  <a className="text-link" href={`#/projects/${p.slug}`}>
+                    Details <Icon name="arrowRight" />
                   </a>
-                ) : (
-                  <span className="link-arrow muted">Coming soon</span>
-                )}
-              </div>
-            </Reveal>
-          ))}
-        </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        ) : (
+          <Empty
+            title="No projects yet"
+            lede="When something is worth sharing, it will land here — with an honest status."
+          />
+        )}
       </div>
     </section>
   );
