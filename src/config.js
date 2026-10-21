@@ -7,38 +7,38 @@
 export const profile = {
   // He/She/They — pick a name that sounds like you. Used in hero,
   // nav and mailto greetings.
-  name: "Alex Morgan",
+  name: "Benjamin Kaindu Mushinge",
 
   // Short title shown under the name in the hero.
-  role: "Builder, tinkerer & curious human",
+  role: "AI & Machine Learning Engineer and Operator",
 
   // The big hero headline. Use {{name}} to insert your name from above.
-  headline: "Hello, I’m {{name}} — I build things, think out loud, and love a good long walk in the hills.",
+  headline: "Hello, I’m {{name}} — I build machine learning systems, operate them in production, and write about what I’m learning along the way.",
 
   // Short paragraph under the headline.
   tagline:
-    "I make software, tools and small experiments, and I write about the ideas behind them. Pull up a chair — there’s always room for one more conversation.",
+    "A year into the field, I design, build and run ML systems end to end — from notebook experiments to models serving real traffic. This is where I share the projects, the ideas, and the questions that don’t fit in a README.",
 
   // Full bio shown in the About section (one array = one paragraph).
   bio: [
-    "I’m a developer and general-purpose idea enthusiast based near the mountains. By day I build web tools that help people get things done; by night I’m usually sketching prototypes, photographing the forest, or reading about trails I definitely plan to hike.",
-    "This site is my little corner of the internet — a place for the projects I’m proud of, the half-formed thoughts and ideas I want to explore, and the people I’d love to hear from. If anything here sparks something, reach out.",
+    "I’m an AI and Machine Learning Engineer and Operator — about a year into the field and deeply into the part most people skip: taking models out of notebooks and into production, then keeping them healthy once they’re there.",
+    "This site is my corner of the internet for the systems I build, the models I operate, and the half-formed ideas I want to explore. If any of it catches your eye — or you think a problem deserves a machine learning solution with a human in the loop — I’d love to hear from you.",
   ],
 
   // A few “currently” items shown as chips in the About section.
   focus: [
-    "Building an open-source hiking log",
-    "Learning Rust (slowly)",
-    "Photographing the autumn forest",
-    "Writing about slow software",
+    "Shipping & operating ML systems in production",
+    "LLM evaluation, guardrails & reliability",
+    "Tuning models under real-world constraints",
+    "Writing about life as an ML operator",
   ],
 
   // Where you call home (used in the About section).
-  location: "Somewhere with tall trees",
+  location: "Arizona, USA",
 
   // The email your Contact section links to — this is the only
   // address visitors will use to get in touch.
-  email: "hello@alexmorgan.dev",
+  email: "kaindumushinge@arizona.edu",
 
   // Optional short email subject if you want something custom.
   emailSubject: "Hello from your website",
@@ -128,9 +128,9 @@ export const ideas = [
 //  Set url to "" to hide an entry.
 // ------------------------------------------------------------
 export const socials = [
-  { label: "GitHub", icon: "github", url: "https://github.com/yourname" },
-  { label: "X", icon: "x", url: "https://x.com/yourname" },
-  { label: "LinkedIn", icon: "linkedin", url: "https://www.linkedin.com/in/yourname" },
+  { label: "GitHub", icon: "github", url: "https://github.com/BenjaminKaindu-ux" },
+  { label: "X", icon: "x", url: "" },
+  { label: "LinkedIn", icon: "linkedin", url: "https://www.linkedin.com/in/benjaminkaindu" },
   { label: "RSS", icon: "rss", url: "" },
 ];
 
@@ -154,4 +154,4 @@ export const photoCredit = {
   site: "unsplash.com",
 };
 
-export const siteTagline = "Projects, ideas & a front porch on the internet";
+export const siteTagline = "ML systems, ideas & notes from the field";

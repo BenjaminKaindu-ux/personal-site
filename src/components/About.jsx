@@ -33,7 +33,7 @@ export default function About() {
               <li>
                 <Icon name="sparkle" />
                 <span>
-                  Always happy to talk about <strong>ideas, maps & the outdoors</strong>
+                  Always happy to talk about <strong>AI/ML, ideas & building in public</strong>
                 </span>
               </li>
             </ul>
