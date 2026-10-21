@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Local dev-only store for the writing studio's Publish button
+content/live-pieces.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

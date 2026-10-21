@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { writingStyles, styleById } from "../styles";
 import Markdown from "../markdown";
 import { profile } from "../config";
+import { publishPiece, isApiAvailableError } from "../api";
 import Icon from "./icons";
 
 const TYPES = [
@@ -63,6 +64,8 @@ export default function Studio() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [publishState, setPublishState] = useState(null); // { ok, text }
   const [hasDraft, setHasDraft] = useState(() => {
     try {
       return Boolean(localStorage.getItem(DRAFT_KEY));
@@ -169,6 +172,44 @@ export default function Studio() {
       setTimeout(() => setCopied(false), 1600);
     } catch {
       /* ignore */
+    }
+  }
+
+  async function publish() {
+    if (!form.title.trim()) {
+      setError("Give it a title first.");
+      return;
+    }
+    setPublishing(true);
+    setPublishState(null);
+    setError("");
+    try {
+      const tags = form.tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+      await publishPiece({
+        type: form.type,
+        title: form.title.trim(),
+        excerpt: form.excerpt.trim(),
+        body: form.body,
+        tags,
+        style: form.type === "essays" ? form.styleId : "",
+      });
+      setPublishState({
+        ok: true,
+        text: `${form.type === "essays" || form.type === "ideas" ? "Published" : "Added"} — reload the page to see “${form.title}” live.`,
+      });
+      saveDraft();
+    } catch (err) {
+      setPublishState({
+        ok: false,
+        text: isApiAvailableError(err)
+          ? "Publishing isn’t configured on this host yet. (Locally: run npm run dev — the studio saves there. Live: add the D1 binding — see README.)"
+          : String(err && err.message ? err.message : err),
+      });
+    } finally {
+      setPublishing(false);
     }
   }
 
@@ -285,7 +326,17 @@ export default function Studio() {
           </div>
 
           <div className="studio-actions">
-            <button type="button" className="btn btn-primary" onClick={dev ? saveToContent : downloadMd} disabled={busy}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={publish}
+              disabled={publishing}
+              title="Appears live on the site for everyone"
+            >
+              <Icon name="sparkle" />
+              {publishing ? "Publishing…" : "Publish to site"}
+            </button>
+            <button type="button" className="btn btn-ghost" onClick={dev ? saveToContent : downloadMd} disabled={busy}>
               <Icon name="pen" />
               {busy ? "Saving…" : primary}
             </button>
@@ -295,6 +346,12 @@ export default function Studio() {
             <button type="button" className="btn btn-ghost" onClick={saveDraft}>
               <Icon name="book" /> Save draft
             </button>
+            {publishState && (
+              <span className={publishState.ok ? "save-ok" : "save-err"} style={{ width: "100%" }}>
+                {publishState.ok ? "✓ " : "⚠ "}
+                {publishState.text}
+              </span>
+            )}
             {saved && (
               <span className="save-ok">
                 ✓ {saved.note || `Saved to ${saved.file}`}
@@ -306,9 +363,10 @@ export default function Studio() {
 
           {!dev && (
             <p className="publish-tip">
-              <strong>To publish from here:</strong> download the <code>.md</code>, then in GitHub →
-              your <code>content/{form.type}/</code> folder click <em>Add file → Create new file</em>,
-              paste it, commit — Cloudflare redeploys automatically.
+              <strong>Publish to site</strong> saves instantly for every visitor (backed by Cloudflare
+              D1). <strong>Download .md</strong> is the fallback for committing content into the repo —
+              in GitHub → your <code>content/{form.type}/</code> folder: <em>Add file → Create new
+              file</em>, paste, commit — and Cloudflare redeploys.
             </p>
           )}
         </div>

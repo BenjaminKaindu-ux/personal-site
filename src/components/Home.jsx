@@ -1,15 +1,16 @@
 import { profile, heroImage, photoCredit } from "../config";
-import { content } from "../content";
+import { useLiveContent } from "../live";
 import { styleById } from "../styles";
 import Icon from "./icons";
 import Reveal from "./Reveal";
-import { SectionHead, SampleBadge, ReadMeta, TagList } from "./ui";
+import { SectionHead, SampleBadge, LiveBadge, ReadMeta, TagList } from "./ui";
 
 export default function Home() {
-  const latestEssays = content.essays.slice(0, 3);
-  const latestIdeas = content.ideas.slice(0, 3);
-  const latestProjects = content.projects.slice(0, 3);
-  const latestNotes = content.notes.slice(0, 2);
+  const { essays, ideas, projects, notes } = useLiveContent();
+  const latestEssays = essays.slice(0, 3);
+  const latestIdeas = ideas.slice(0, 3);
+  const latestProjects = projects.slice(0, 3);
+  const latestNotes = notes.slice(0, 2);
 
   return (
     <>
@@ -68,7 +69,10 @@ export default function Home() {
                 <Reveal as="article" key={e.slug} className="card" delay={i * 70}>
                   <div className="card-top">
                     <span className="pill">{styleById(e.style).icon} {styleById(e.style).label}</span>
-                    <SampleBadge status={e.status} />
+                    <span className="card-badges">
+                      <LiveBadge live={e.live} />
+                      <SampleBadge status={e.status} />
+                    </span>
                   </div>
                   <h3 className="card-title">
                     <a href={`#/essays/${e.slug}`}>{e.title}</a>
@@ -98,7 +102,10 @@ export default function Home() {
                 <ul className="stack-list">
                   {latestIdeas.map((idea) => (
                     <Reveal as="li" key={idea.slug} className="stack-item">
-                      <SampleBadge status={idea.status} />
+                      <span>
+                        <SampleBadge status={idea.status} />
+                        <LiveBadge live={idea.live} />
+                      </span>
                       <h3>
                         <a href={`#/ideas`}>{idea.title}</a>
                       </h3>
@@ -117,7 +124,10 @@ export default function Home() {
                 <ul className="stack-list">
                   {latestProjects.map((p) => (
                     <Reveal as="li" key={p.slug} className="stack-item">
-                      <SampleBadge status={p.status} />
+                      <span>
+                        <SampleBadge status={p.status} />
+                        <LiveBadge live={p.live} />
+                      </span>
                       <h3>
                         <a href={`#/projects/${p.slug}`}>{p.title}</a>
                       </h3>
@@ -143,7 +153,10 @@ export default function Home() {
                 <Reveal as="article" key={n.slug} className="card" delay={i * 70}>
                   <div className="card-top">
                     <span className="pill pill-sage">Learning note</span>
-                    <SampleBadge status={n.status} />
+                    <span className="card-badges">
+                      <LiveBadge live={n.live} />
+                      <SampleBadge status={n.status} />
+                    </span>
                   </div>
                   <h3 className="card-title">
                     <a href={`#/notes/${n.slug}`}>{n.title}</a>

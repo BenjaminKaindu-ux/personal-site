@@ -392,6 +392,19 @@ button {
   background: rgba(236, 210, 191, 0.35);
 }
 
+.badge-live {
+  color: var(--green);
+  border-color: rgba(44, 90, 63, 0.4);
+  background: rgba(220, 229, 216, 0.6);
+  font-weight: 800;
+}
+
+.card-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .tag-row {
   display: flex;
   flex-wrap: wrap;

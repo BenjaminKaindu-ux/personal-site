@@ -1,21 +1,23 @@
 import { useMemo, useState } from "react";
-import { content, searchItems, tagCounts } from "../content";
+import { searchItems, tagCounts } from "../content";
 import { styleById } from "../styles";
+import { useLiveContent } from "../live";
 import Icon from "./icons";
 import Reveal from "./Reveal";
 import { respondHref } from "../respond";
-import { PageHead, Empty, SearchBox, TagFilter, TagList, ReadMeta, SampleBadge } from "./ui";
+import { PageHead, Empty, SearchBox, TagFilter, TagList, ReadMeta, SampleBadge, LiveBadge } from "./ui";
 
 export default function Essays() {
   const [q, setQ] = useState("");
   const [tag, setTag] = useState("");
+  const { essays } = useLiveContent();
 
-  const allTags = useMemo(() => Object.keys(tagCounts(content.essays)).sort(), []);
+  const allTags = useMemo(() => Object.keys(tagCounts(essays)).sort(), [essays]);
   const items = useMemo(() => {
-    let list = searchItems(content.essays, q);
+    let list = searchItems(essays, q);
     if (tag) list = list.filter((e) => e.tags.includes(tag));
     return list;
-  }, [q, tag]);
+  }, [q, tag, essays]);
 
   return (
     <section className="page">
@@ -26,7 +28,7 @@ export default function Essays() {
           lede="Essays are the deep end of the garden. Each one comes with a date, tags, and a way to answer back."
         />
 
-        {content.essays.length > 0 && (
+        {essays.length > 0 && (
           <div className="toolbar">
             <SearchBox value={q} onChange={setQ} placeholder="Search essays…" label="essays" />
             <TagFilter tags={allTags} active={tag} onSelect={setTag} />
@@ -41,7 +43,10 @@ export default function Essays() {
                 <Reveal as="article" key={e.slug} className="card" delay={(i % 3) * 70}>
                   <div className="card-top">
                     <span className="pill">{style.icon} {style.label}</span>
-                    <SampleBadge status={e.status} />
+                    <span className="card-badges">
+                      <LiveBadge live={e.live} />
+                      <SampleBadge status={e.status} />
+                    </span>
                   </div>
                   <h3 className="card-title">
                     <a href={`#/essays/${e.slug}`}>{e.title}</a>
@@ -63,9 +68,9 @@ export default function Essays() {
           </div>
         ) : (
           <Empty
-            title={content.essays.length === 0 ? "No essays yet" : "Nothing matches that search"}
+            title={essays.length === 0 ? "No essays yet" : "Nothing matches that search"}
             lede={
-              content.essays.length === 0
+              essays.length === 0
                 ? "Write your first essay from the Write studio (local dev server) and it will appear here."
                 : "Try a different phrase or clear the topic filter."
             }

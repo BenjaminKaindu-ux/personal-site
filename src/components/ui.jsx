@@ -61,6 +61,15 @@ export function SampleBadge({ status }) {
   );
 }
 
+export function LiveBadge({ live }) {
+  if (!live) return null;
+  return (
+    <span className="badge badge-live" title="Published live from the Write studio — lives in the site's database.">
+      ● Live
+    </span>
+  );
+}
+
 export function StatusBadge({ status }) {
   if (!status || status === "sample") return null;
   return <span className="badge">{status}</span>;

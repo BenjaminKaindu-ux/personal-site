@@ -1,11 +1,12 @@
-import { bySlug } from "../content";
+import { useLiveContent } from "../live";
 import Markdown from "../markdown";
 import Icon from "./icons";
-import { Empty, TagList, SampleBadge } from "./ui";
+import { Empty, TagList, SampleBadge, LiveBadge } from "./ui";
 import { respondHref } from "../respond";
 
 export default function ProjectPage({ slug }) {
-  const p = bySlug.projects[slug];
+  const { projects } = useLiveContent();
+  const p = projects.find((it) => it.slug === slug);
 
   if (!p) {
     return (
@@ -35,6 +36,7 @@ export default function ProjectPage({ slug }) {
               <span className={`pill ${p.status === "sample" ? "pill-sage" : "pill-terra"}`}>
                 {p.status === "sample" ? "Sample project" : p.status || "Project"}
               </span>
+              <LiveBadge live={p.live} />
               <SampleBadge status={p.status} />
             </div>
             <h1 className="article-title">{p.title}</h1>

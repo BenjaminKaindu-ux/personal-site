@@ -27,27 +27,23 @@ npm run preview
 
 ---
 
-## ✍️ The Writing Studio — where you actually write
+## ✍️ The Writing Studio — where you actually write, *and publish*
 
-Click **Write** in the navigation (or go to `#/studio`) — works both locally **and on the live site**.
+Click **Write** in the navigation (or go to `#/studio`) — it works locally **and on the live site**.
 
-You get a proper editor:
+You get a proper editor with **live Markdown preview**, the **8 writing styles guide**, and a
+**Publish to site** button:
 
-- **Title, date, type** (essay / idea / learning note / project), tags, excerpt, and a big body
-  textarea with **live Markdown preview**
-- **Writing-style guide** — choose from 8 common styles (Reflective Essay, Insight, Diary,
-  Story, Argument, How-to, Listicle, Letter) and see its voice + structure as you write
-- **Save** — works honestly with no backend, in two different ways:
+- **Publish to site** — saves instantly for every visitor, backed by **Cloudflare D1**, a free
+  edge database (no login, no third-party services, no API keys). Published pieces appear in the
+  Essays / Ideas / Projects / Notes lists and on Home with a **● Live** badge.
+- **Save to content/** (dev only) — writes the file into `content/<type>/<filename>.md`
+- **Save draft** — keeps your work safe in your browser
+- **Download .md** / **Copy markdown** — the fallback for committing content into the repo
 
-  **On your machine (`npm run dev`):** *Save to content/* writes the file straight into
-  `content/<type>/<filename>.md` through a tiny dev-server-only helper.
-
-  **On the deployed site:** the site stays 100% static, so the studio gives you
-  *Save draft* (keeps your work in your browser, private) and *Download .md* / *Copy markdown* —
-  to publish, upload the file to your repo's `content/` folder and Cloudflare redeploys.
-
-> Restart `npm run dev` after saving locally to see the new file in the lists, then
-> `npm run build` to include it in the production site.
+> The site stays a **static Pages project**. The tiny `functions/api/pieces.js` is a single
+> Cloudflare Pages Function served by Cloudflare on the same Git deploy — no `wrangler deploy`
+> on your side, works with the ordinary Pages → Connect to Git flow.
 
 ### If you'd rather just write Markdown by hand
 
@@ -157,12 +153,30 @@ interests. It makes no claims beyond that. Adjust it whenever you like.
    - **Build command:** `npm run build`
    - **Build output directory:** `dist`
 
-4. **Save & Deploy.** That's it — no `wrangler deploy`, no Worker, no functions. Cloudflare
-   serves the static files straight from `dist/` on every push.
+4. **Save & Deploy.** That's it — no `wrangler deploy`, no Worker project. Cloudflare serves the
+   static files straight from `dist/` on every push, and automatically wires up the one small
+   Page Function in `functions/` (just the publishing API). Optional: add the D1 binding for
+   live publishing (steps below).
 
 > ℹ️ This is a **static Pages site only** — zero server-side code ships to production. The
 > Writing Studio's save feature exists solely in local dev (`npm run dev`); the deployed site
 > contains no mechanism (and no API keys) to write files.
+
+### 🗄 Enable live publishing (Cloudflare D1) — optional but recommended
+
+To make **Publish to site** work on the deployed site (instant writing for everyone), add a
+free Cloudflare D1 database and bind it:
+
+1. **Create the database:** Cloudflare dashboard → **Workers & Pages → D1 → Create database**
+   → name it `personal-site-db` → Create.
+2. **Bind it to the Pages project:** open your Pages project → **Settings → Bindings** →
+   **Add → D1 database** → choose `personal-site-db` → set the **binding name to exactly `DB`**
+   (the function reads `context.env.DB`) → **Save**.
+3. That's it. The table is created automatically on first use (schema reference:
+   `d1/schema.sql`). Redeploy once after adding the binding.
+
+In local dev the same `/api/pieces` API is served by the dev server (stored in a gitignored
+`content/live-pieces.json`), so the studio behaves identically before you've set up D1.
 
 ---
 

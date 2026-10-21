@@ -1,11 +1,13 @@
-import { content } from "../content";
+import { useLiveContent } from "../live";
 import Icon from "./icons";
 import Reveal from "./Reveal";
-import { PageHead, Empty } from "./ui";
+import { PageHead, Empty, LiveBadge } from "./ui";
 import { respondHref } from "../respond";
 
 export default function Ideas() {
-  const items = content.ideas;
+  const { ideas } = useLiveContent();
+  const items = ideas;
+
   return (
     <section className="page">
       <div className="container">
@@ -21,8 +23,9 @@ export default function Ideas() {
               <Reveal as="article" key={idea.slug} className="card idea-card" delay={(i % 3) * 70}>
                 <div className="card-top">
                   <span className="pill pill-sage">
-                    {idea.status === "sample" ? "Sample thought" : idea.dateLabel || "Note"}
+                    {idea.status === "sample" ? "Sample thought" : idea.dateLabel || (idea.live ? "Published" : "Note")}
                   </span>
+                  <LiveBadge live={idea.live} />
                 </div>
                 <h3 className="card-title">{idea.title}</h3>
                 {idea.excerpt && <p className="card-excerpt">{idea.excerpt}</p>}
@@ -37,7 +40,7 @@ export default function Ideas() {
         ) : (
           <Empty
             title="No ideas yet"
-            lede="Small thoughts will live here — add the first one from the Write studio."
+            lede="Small thoughts will live here — add the first from the Write studio."
           />
         )}
       </div>

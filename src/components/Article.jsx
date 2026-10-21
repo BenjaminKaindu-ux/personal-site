@@ -1,16 +1,18 @@
 import { styleById } from "../styles";
 import Markdown from "../markdown";
 import Icon from "./icons";
-import { bySlug } from "../content";
+import { useLiveContent } from "../live";
 import { respondHref } from "../respond";
-import { Empty, TagList, SampleBadge } from "./ui";
+import { Empty, TagList, SampleBadge, LiveBadge } from "./ui";
 
 /**
  * Shared article reader for essays and learning notes.
  * `kind` is "essays" | "notes"; `slug` comes from the route.
  */
 export default function ArticlePage({ kind, slug, backView, backLabel }) {
-  const item = bySlug[kind][slug];
+  const { essays, notes } = useLiveContent();
+  const list = kind === "essays" ? essays : notes;
+  const item = list.find((it) => it.slug === slug);
   const style = item?.style ? styleById(item.style) : null;
 
   if (!item) {
@@ -43,13 +45,13 @@ export default function ArticlePage({ kind, slug, backView, backLabel }) {
             <div className="article-badges">
               {style ? <span className="pill">{style.icon} {style.label}</span> : null}
               {kind === "notes" && <span className="pill pill-sage">Learning note</span>}
+              <LiveBadge live={item.live} />
               <SampleBadge status={item.status} />
             </div>
             <h1 className="article-title">{item.title}</h1>
             <div className="article-meta">
               {item.dateLabel && <span className="meta-bit">{item.dateLabel}</span>}
               <span className="meta-bit">{item.readMins} min read</span>
-              {item.slug && <span className="meta-bit">{item.slug}</span>}
             </div>
             <TagList tags={item.tags} />
           </header>
